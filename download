@@ -1,0 +1,9 @@
+# Never commit real household data or results
+*_RESULTS*.xlsx
+*_CART_THRESHOLDS*.xlsx
+id_mapping_PRIVATE.xlsx
+data/*
+!data/sample_data_synthetic.xlsx
+__pycache__/
+*.pyc
+~$*
