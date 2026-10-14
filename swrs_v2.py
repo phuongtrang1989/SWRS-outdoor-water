@@ -1,35 +1,5 @@
 # =====================================================================
 # SMART WATER RECOMMENDATION SYSTEM (SWRS) - REVISED VERSION (v2)
-# Keywords -> LDA -> Peer (leave-one-out) + CF -> Rule-based -> Weekly benchmark
-# Python 3.11
-# ---------------------------------------------------------------------
-# WHAT CHANGED VS. THE ORIGINAL CODE  (mapped to Reviewer 1 comments)
-#
-#  [R1.3 - data leakage]
-#   1. Chronological split: TRAIN = Date < TEST_START, TEST = Date >= TEST_START
-#      (TEST_START = first week boundary on/after 1 June 2024).
-#   2. Behavioural tokens (use_*, intensity_*, freq_*, weekend_peak, seasonal_*)
-#      are computed ONLY from days BEFORE the start of the target week
-#      (30-day / 180-day windows ending the day before week_start).
-#      The token spike_abnormal (today vs mean30) is REMOVED.
-#   3. LDA dictionary + model are fitted on TRAIN documents only; topics for
-#      all days are inferred with the trained model (no re-fitting on test).
-#   4. Same-day peer median is LEAVE-ONE-OUT (household excluded from its own
-#      benchmark).
-#   5. CF (truncated SVD) matrix is built from TRAIN observations only.
-#
-#  [R1.5 - ablation]   full-factorial ablation of the 4 components
-#      (CART, LDA, CF, Rules) = 16 configurations, repeated over several
-#      random seeds, with Wilcoxon signed-rank tests vs. the full model.
-#  [R1.7 - temporal dependence]  household-level (cluster) bootstrap 95% CI.
-#  [R1.4 - reproducibility]  C_v coherence for K = 3..10, topic proportions,
-#      topic stability across seeds, and a sheet with ALL hyperparameters.
-#  [R1.12 - code sharing]  optional anonymisation of household IDs in outputs.
-#
-#  Metrics are reported in L/week on TEST household-weeks only.
-#  Pool top-up rule is unchanged (200 L/day x heat factor x rain factor).
-#  NOTE: the pool flag is now read from the pool_yes token (the original
-#  string check missed numeric values such as 1.0).
 # =====================================================================
 
 import sys
