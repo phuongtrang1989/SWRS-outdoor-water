@@ -1,5 +1,5 @@
 # =====================================================================
-# SMART WATER RECOMMENDATION SYSTEM (SWRS) - REVISED VERSION (v2)
+# SMART WATER RECOMMENDATION SYSTEM (SWRS) 
 # =====================================================================
 
 import sys
@@ -24,11 +24,11 @@ def main():
     # 0. SETTINGS
     # =====================================================================
     DATA_PATH = str(Path(__file__).resolve().parent / "data" / "sample_data_synthetic.xlsx")
-    if len(sys.argv) > 1:                      # allow: python swrs_v2.py data.xlsx
+    if len(sys.argv) > 1:                     
         DATA_PATH = sys.argv[1]
 
     SHEET_PROPS = "property detail"
-    SHEET_USAGE = "daily outdoor use"         # wide format (one column per date)
+    SHEET_USAGE = "daily outdoor use"        
     SHEET_CLIM = "Climic data"
 
     ANCHOR = pd.Timestamp("2023-01-01")       # Sunday -> week 1 starts here
@@ -90,7 +90,7 @@ def main():
     #                  recovered as sheet / POOL_AREA_M2 and the weekly water balance
     #                  max(sum E - sum P, 0) x POOL_AREA_M2 is applied (recommended)
     POOL_METHOD = "sheet_net"
-    POOL_SHEET = "Weekly Pool Topup"          # <-- sheet holding Date + pool_topup (L/day)
+    POOL_SHEET = "Weekly Pool Topup"          
     POOL_AREA_M2 = 32.0                       # representative pool surface area (m2)
     EVAP_COL = "Evaporation"                  # daily evaporation (mm/day) in the climate sheet
     POOL_TOPUP_HOT_NO_RAIN = 200.0            # L/day, only used when POOL_METHOD = "rule"
@@ -110,7 +110,7 @@ def main():
                      "age_", "tmax_", "tmin_", "rain_", "soil_"]
 
     # =====================================================================
-    # 1. LOAD + CLEAN (same logic as original)
+    # 1. LOAD + CLEAN DATA
     # =====================================================================
     print("Loading data ...")
     props = pd.read_excel(DATA_PATH, sheet_name=SHEET_PROPS, engine="openpyxl")
@@ -211,7 +211,7 @@ def main():
           f"train < {TEST_START.date()} <= test")
 
     # =====================================================================
-    # 2. KEYWORDS (static + climate of the day + LAGGED behaviour)
+    # 2. KEYWORDS (static + climate of the day +  behaviour)
     # =====================================================================
     def bin_tokens(series, bins, labels, prefix):
         s = pd.to_numeric(series, errors="coerce")
@@ -297,7 +297,7 @@ def main():
 
 
     # Behavioural tokens are identical for all days of a household-week and use
-    # ONLY days strictly before week_start  ->  no information on the target week.
+ 
     beh_rows = []
     for hid, g in usage.groupby("house_id", sort=False):
         g = g.sort_values("Date")
@@ -374,7 +374,7 @@ def main():
     print(f"Keywords done ({time.time() - t0:.0f}s)")
 
     # =====================================================================
-    # 3. LDA  (fit on TRAIN only, infer for all days)
+    # 3. LDA  
     # =====================================================================
     train_texts = usage.loc[usage["is_train"], "keywords"].tolist()
 
@@ -405,7 +405,7 @@ def main():
 
 
     # =====================================================================
-    # 4. BENCHMARK ENGINE (one configuration)
+    # 4. BENCHMARK ENGINE
     # =====================================================================
     def loo_median(df, group_cols, val):
         """Leave-one-out median of `val` within groups; returns (median, n_peers)."""
@@ -517,7 +517,7 @@ def main():
 
 
     # =====================================================================
-    # 5. EXPERIMENTS: seeds x configurations
+    # 5. EXPERIMENTS
     # =====================================================================
     NAMED = {(0, 0, 0, 0): "Peer baseline",
              (0, 0, 1, 0): "CF model",
@@ -617,7 +617,7 @@ def main():
     table2 = table2.sort_values("order").drop(columns="order")
 
     # =====================================================================
-    # 6. LDA DIAGNOSTICS: coherence, proportions, stability
+    # 6. LDA DIAGNOSTICS
     # =====================================================================
     coh_rows = []
     if COHERENCE_K:
@@ -647,7 +647,7 @@ def main():
     stability = pd.DataFrame(stab_rows)
 
     # =====================================================================
-    # 7. MAIN-RUN OUTPUTS (full model, main seed): weekly summary + tables
+    # 7. MAIN-RUN OUTPUTS 
     # =====================================================================
     r = main_run["full"]
     ctx = usage[["house_id", "Date", "week_seq", "week_start", "is_train", "outdoor_liters",
@@ -750,7 +750,7 @@ def main():
                 + (["Evaporation_week_mm"] if "Evaporation_week_mm" in weekly.columns else [])]
 
     # =====================================================================
-    # 8. HYPERPARAMETERS + RULES (for Reviewer 1, comment 4)
+    # 8. HYPERPARAMETERS + RULES 
     # =====================================================================
     info_full = cf_infos.get(((1, 1, 1, 1), SEEDS[0]), {})
     hyper = pd.DataFrame([
